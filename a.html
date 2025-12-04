@@ -255,6 +255,7 @@
         .message-text {
             color: #dcddde;
             line-height: 1.5;
+            word-wrap: break-word;
         }
 
         .message-input {
@@ -377,10 +378,10 @@
 <body>
     <div class="login-container" id="loginContainer">
         <div class="login-box">
-            <h1>🎮 ChatApp</h1>
+            <h1>💬 ChatApp</h1>
             <form id="authForm">
                 <div class="input-group">
-                    <label for="username">Nom d'utilisateur</label>
+                    <label for="username">Nom d utilisateur</label>
                     <input type="text" id="username" required autocomplete="username">
                 </div>
                 <div class="input-group">
@@ -390,7 +391,7 @@
                 <button type="submit" class="btn" id="authBtn">Se connecter</button>
             </form>
             <div class="toggle-auth" id="toggleAuth">
-                Pas de compte ? S'inscrire
+                Pas de compte ? S inscrire
             </div>
         </div>
     </div>
@@ -402,14 +403,14 @@
             <div class="user-info">
                 <div class="user-avatar" id="userAvatar"></div>
                 <div id="userName"></div>
-                <button class="logout-btn" id="logoutBtn">Déconnexion</button>
+                <button class="logout-btn" id="logoutBtn">Deconnexion</button>
             </div>
         </div>
 
         <div class="chat-main">
             <div class="chat-header">
                 <span>#</span>
-                <span id="currentChannelName">général</span>
+                <span id="currentChannelName">general</span>
             </div>
             <div class="messages" id="messages"></div>
             <div class="message-input">
@@ -423,7 +424,7 @@
         </div>
 
         <div class="members-sidebar">
-            <div class="members-title">En ligne — <span id="onlineCount">0</span></div>
+            <div class="members-title">Tous les utilisateurs - <span id="onlineCount">0</span></div>
             <div id="membersList"></div>
         </div>
     </div>
@@ -433,11 +434,13 @@
         var isSignUp = false;
         var currentChannel = 1;
         var channels = [
-            { id: 1, name: 'général' },
+            { id: 1, name: 'general' },
             { id: 2, name: 'random' },
             { id: 3, name: 'aide' },
             { id: 4, name: 'annonces' }
         ];
+
+        var STORAGE_KEY = 'chatapp_global_data_v2';
 
         var loginContainer = document.getElementById('loginContainer');
         var chatContainer = document.getElementById('chatContainer');
@@ -455,21 +458,45 @@
         var membersList = document.getElementById('membersList');
         var onlineCount = document.getElementById('onlineCount');
 
+        function getGlobalData() {
+            try {
+                var data = localStorage.getItem(STORAGE_KEY);
+                if (data) {
+                    return JSON.parse(data);
+                }
+            } catch (e) {
+                console.error('Error reading storage:', e);
+            }
+            return {
+                users: [],
+                messages: {},
+                currentUser: null
+            };
+        }
+
+        function saveGlobalData(data) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                console.error('Error saving storage:', e);
+            }
+        }
+
         function init() {
-            var savedUser = localStorage.getItem('chatUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
+            var globalData = getGlobalData();
+            if (globalData.currentUser) {
+                currentUser = globalData.currentUser;
                 showChat();
             }
             loadChannels();
             loadMessages();
-            loadOnlineUsers();
+            loadAllUsers();
         }
 
         toggleAuth.addEventListener('click', function() {
             isSignUp = !isSignUp;
             authBtn.textContent = isSignUp ? "S'inscrire" : "Se connecter";
-            toggleAuth.textContent = isSignUp ? "Déjà un compte ? Se connecter" : "Pas de compte ? S'inscrire";
+            toggleAuth.textContent = isSignUp ? "Deja un compte ? Se connecter" : "Pas de compte ? S'inscrire";
         });
 
         authForm.addEventListener('submit', function(e) {
@@ -479,30 +506,45 @@
 
             if (!username || !password) return;
 
-            var users = JSON.parse(localStorage.getItem('chatUsers') || '[]');
+            var globalData = getGlobalData();
 
             if (isSignUp) {
-                var userExists = users.find(function(u) { return u.username === username; });
+                var userExists = false;
+                for (var i = 0; i < globalData.users.length; i++) {
+                    if (globalData.users[i].username === username) {
+                        userExists = true;
+                        break;
+                    }
+                }
                 if (userExists) {
-                    alert('Cet utilisateur existe déjà !');
+                    alert('Cet utilisateur existe deja !');
                     return;
                 }
-                var newUser = { username: username, password: password };
-                users.push(newUser);
-                localStorage.setItem('chatUsers', JSON.stringify(users));
-                currentUser = newUser;
-                localStorage.setItem('chatUser', JSON.stringify(newUser));
-                updateOnlineUsers(true);
+                var newUser = { 
+                    username: username, 
+                    password: password,
+                    createdAt: new Date().toISOString()
+                };
+                globalData.users.push(newUser);
+                currentUser = { username: username };
+                globalData.currentUser = currentUser;
+                saveGlobalData(globalData);
                 showChat();
             } else {
-                var user = users.find(function(u) { return u.username === username && u.password === password; });
+                var user = null;
+                for (var i = 0; i < globalData.users.length; i++) {
+                    if (globalData.users[i].username === username && globalData.users[i].password === password) {
+                        user = globalData.users[i];
+                        break;
+                    }
+                }
                 if (user) {
-                    currentUser = user;
-                    localStorage.setItem('chatUser', JSON.stringify(user));
-                    updateOnlineUsers(true);
+                    currentUser = { username: username };
+                    globalData.currentUser = currentUser;
+                    saveGlobalData(globalData);
                     showChat();
                 } else {
-                    alert('Nom d\'utilisateur ou mot de passe incorrect !');
+                    alert('Nom d utilisateur ou mot de passe incorrect !');
                 }
             }
 
@@ -511,8 +553,9 @@
         });
 
         logoutBtn.addEventListener('click', function() {
-            updateOnlineUsers(false);
-            localStorage.removeItem('chatUser');
+            var globalData = getGlobalData();
+            globalData.currentUser = null;
+            saveGlobalData(globalData);
             currentUser = null;
             loginContainer.style.display = 'flex';
             chatContainer.classList.remove('active');
@@ -524,57 +567,92 @@
             userName.textContent = currentUser.username;
             userAvatar.textContent = currentUser.username[0].toUpperCase();
             loadMessages();
-            loadOnlineUsers();
+            loadAllUsers();
+            setInterval(function() {
+                loadMessages();
+                loadAllUsers();
+            }, 2000);
         }
 
         function loadChannels() {
             channelsList.innerHTML = '';
-            channels.forEach(function(channel) {
+            for (var i = 0; i < channels.length; i++) {
+                var channel = channels[i];
                 var channelEl = document.createElement('div');
                 channelEl.className = 'channel' + (channel.id === currentChannel ? ' active' : '');
                 channelEl.innerHTML = '<span>#</span> ' + channel.name;
-                channelEl.addEventListener('click', function() { switchChannel(channel.id); });
+                channelEl.setAttribute('data-channel-id', channel.id);
+                channelEl.addEventListener('click', function() { 
+                    switchChannel(parseInt(this.getAttribute('data-channel-id'))); 
+                });
                 channelsList.appendChild(channelEl);
-            });
+            }
         }
 
         function switchChannel(channelId) {
             currentChannel = channelId;
-            var channel = channels.find(function(c) { return c.id === channelId; });
+            var channel = null;
+            for (var i = 0; i < channels.length; i++) {
+                if (channels[i].id === channelId) {
+                    channel = channels[i];
+                    break;
+                }
+            }
             currentChannelName.textContent = channel.name;
             loadChannels();
             loadMessages();
         }
 
         function loadMessages() {
-            var allMessages = JSON.parse(localStorage.getItem('chatMessages') || '{}');
-            var channelMessages = allMessages[currentChannel] || [];
+            var globalData = getGlobalData();
+            var channelMessages = globalData.messages[currentChannel] || [];
+            
+            var currentScroll = messages.scrollTop;
+            var isAtBottom = messages.scrollHeight - messages.scrollTop === messages.clientHeight;
             
             messages.innerHTML = '';
-            channelMessages.forEach(function(msg) {
-                displayMessage(msg);
-            });
-            messages.scrollTop = messages.scrollHeight;
+            for (var i = 0; i < channelMessages.length; i++) {
+                displayMessage(channelMessages[i]);
+            }
+            
+            if (isAtBottom) {
+                messages.scrollTop = messages.scrollHeight;
+            } else {
+                messages.scrollTop = currentScroll;
+            }
         }
 
         function displayMessage(msg) {
             var messageEl = document.createElement('div');
             messageEl.className = 'message';
             
-            var time = new Date(msg.timestamp).toLocaleTimeString('fr-FR', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
+            var timeDate = new Date(msg.timestamp);
+            var hours = timeDate.getHours();
+            var minutes = timeDate.getMinutes();
+            if (hours < 10) hours = '0' + hours;
+            if (minutes < 10) minutes = '0' + minutes;
+            var time = hours + ':' + minutes;
 
-            messageEl.innerHTML = '<div class="message-avatar">' + msg.user[0].toUpperCase() + '</div>' +
+            var avatarColor = '#5865f2';
+            if (msg.user !== currentUser.username) {
+                avatarColor = '#' + Math.floor(Math.abs(Math.sin(msg.user.charCodeAt(0)) * 16777215)).toString(16);
+            }
+
+            messageEl.innerHTML = '<div class="message-avatar" style="background:' + avatarColor + '">' + msg.user[0].toUpperCase() + '</div>' +
                 '<div class="message-content">' +
                     '<div class="message-header">' +
                         '<span class="message-author">' + msg.user + '</span>' +
                         '<span class="message-time">' + time + '</span>' +
                     '</div>' +
-                    '<div class="message-text">' + msg.text + '</div>' +
+                    '<div class="message-text">' + escapeHtml(msg.text) + '</div>' +
                 '</div>';
             messages.appendChild(messageEl);
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function sendMessage() {
@@ -582,18 +660,18 @@
             if (!text || !currentUser) return;
 
             var message = {
-                id: Date.now(),
+                id: Date.now() + '_' + Math.random(),
                 user: currentUser.username,
                 text: text,
                 timestamp: new Date().toISOString()
             };
 
-            var allMessages = JSON.parse(localStorage.getItem('chatMessages') || '{}');
-            if (!allMessages[currentChannel]) {
-                allMessages[currentChannel] = [];
+            var globalData = getGlobalData();
+            if (!globalData.messages[currentChannel]) {
+                globalData.messages[currentChannel] = [];
             }
-            allMessages[currentChannel].push(message);
-            localStorage.setItem('chatMessages', JSON.stringify(allMessages));
+            globalData.messages[currentChannel].push(message);
+            saveGlobalData(globalData);
 
             displayMessage(message);
             messageInput.value = '';
@@ -605,41 +683,34 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        function updateOnlineUsers(isOnline) {
-            if (!currentUser) return;
-            
-            var onlineUsers = JSON.parse(localStorage.getItem('onlineUsers') || '[]');
-            var userIndex = onlineUsers.findIndex(function(u) { return u.username === currentUser.username; });
-            
-            if (isOnline && userIndex === -1) {
-                onlineUsers.push(currentUser);
-            } else if (!isOnline && userIndex !== -1) {
-                onlineUsers.splice(userIndex, 1);
-            }
-            
-            localStorage.setItem('onlineUsers', JSON.stringify(onlineUsers));
-            loadOnlineUsers();
-        }
-
-        function loadOnlineUsers() {
-            var onlineUsers = JSON.parse(localStorage.getItem('onlineUsers') || '[]');
+        function loadAllUsers() {
+            var globalData = getGlobalData();
             membersList.innerHTML = '';
-            onlineCount.textContent = onlineUsers.length;
+            onlineCount.textContent = globalData.users.length;
 
-            onlineUsers.forEach(function(user) {
+            for (var i = 0; i < globalData.users.length; i++) {
+                var user = globalData.users[i];
                 var memberEl = document.createElement('div');
                 memberEl.className = 'member';
-                memberEl.innerHTML = '<div class="member-avatar">' +
+                
+                var avatarColor = '#43b581';
+                if (user.username !== currentUser.username) {
+                    avatarColor = '#' + Math.floor(Math.abs(Math.sin(user.username.charCodeAt(0)) * 16777215)).toString(16);
+                }
+
+                var isCurrentUser = user.username === currentUser.username;
+                var statusDot = isCurrentUser ? '<div class="status-dot"></div>' : '';
+                
+                memberEl.innerHTML = '<div class="member-avatar" style="background:' + avatarColor + '">' +
                         user.username[0].toUpperCase() +
-                        '<div class="status-dot"></div>' +
+                        statusDot +
                     '</div>' +
-                    '<div class="member-name">' + user.username + '</div>';
+                    '<div class="member-name">' + user.username + (isCurrentUser ? ' (vous)' : '') + '</div>';
                 membersList.appendChild(memberEl);
-            });
+            }
         }
 
         init();
-        setInterval(loadOnlineUsers, 3000);
     </script>
 </body>
 </html>
