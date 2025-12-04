@@ -530,250 +530,285 @@
 
     <div class="notification" id="notification"></div>
 
-    <script>
-        // IN-MEMORY DATABASE
-        const database = {
-            users: {},
-            chats: {}
-        };
+<script>
+/* ------------------------------
+   LOCALSTORAGE DATABASE SYSTEM
+------------------------------ */
 
-        let currentUser = null;
-        let currentChat = null;
+// Load database from localStorage or create new
+function loadDatabase() {
+    const db = localStorage.getItem("mcode_database");
+    return db ? JSON.parse(db) : { users: {}, chats: {} };
+}
 
-        // SWITCH BETWEEN LOGIN/SIGNUP
-        function showSignup() {
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('signupBox').style.display = 'block';
-        }
+// Save database to localStorage
+function saveDatabase() {
+    localStorage.setItem("mcode_database", JSON.stringify(database));
+}
 
-        function showLogin() {
-            document.getElementById('signupBox').style.display = 'none';
-            document.getElementById('loginBox').style.display = 'block';
-        }
+// Load current user if remembered
+function loadCurrentUser() {
+    const user = localStorage.getItem("mcode_currentUser");
+    return user ? JSON.parse(user) : null;
+}
 
-        // NOTIFICATIONS
-        function showNotification(message) {
-            const notif = document.getElementById('notification');
-            notif.textContent = message;
-            notif.style.display = 'block';
-            setTimeout(() => {
-                notif.style.display = 'none';
-            }, 3000);
-        }
+// Save current user
+function saveCurrentUser() {
+    if (currentUser)
+        localStorage.setItem("mcode_currentUser", JSON.stringify(currentUser));
+    else
+        localStorage.removeItem("mcode_currentUser");
+}
 
-        // SIGNUP
-        document.getElementById('signupForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const username = document.getElementById('signupUsername').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
-            
-            const errorEl = document.getElementById('signupError');
-            const successEl = document.getElementById('signupSuccess');
-            errorEl.style.display = 'none';
-            successEl.style.display = 'none';
+/* ------------------------------
+   INITIALIZATION
+------------------------------ */
 
-            if (password !== passwordConfirm) {
-                errorEl.textContent = 'Les mots de passe ne correspondent pas';
-                errorEl.style.display = 'block';
-                return;
-            }
+let database = loadDatabase();
+let currentUser = loadCurrentUser();
+let currentChat = null;
 
-            if (database.users[username]) {
-                errorEl.textContent = 'Ce pseudo est déjà utilisé';
-                errorEl.style.display = 'block';
-                return;
-            }
+// If user already logged in ⇒ go to messaging page
+window.onload = () => {
+    if (currentUser) {
+        document.getElementById('loginPage').classList.remove('active');
+        document.getElementById('messagingPage').classList.add('active');
+        document.getElementById('currentUsername').textContent = currentUser.username;
+        loadFriends();
+    }
+};
 
-            database.users[username] = {
-                username,
-                password,
-                friends: [],
-                createdAt: new Date().toISOString()
-            };
-            
-            successEl.textContent = 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.';
-            successEl.style.display = 'block';
-            
-            document.getElementById('signupForm').reset();
-            setTimeout(() => {
-                showLogin();
-            }, 2000);
-        });
+/* ------------------------------
+   LOGIN / SIGNUP SWITCH
+------------------------------ */
 
-        // LOGIN
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            const errorEl = document.getElementById('loginError');
-            errorEl.style.display = 'none';
+function showSignup() {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('signupBox').style.display = 'block';
+}
 
-            if (!database.users[username]) {
-                errorEl.textContent = 'Utilisateur non trouvé';
-                errorEl.style.display = 'block';
-                return;
-            }
+function showLogin() {
+    document.getElementById('signupBox').style.display = 'none';
+    document.getElementById('loginBox').style.display = 'block';
+}
 
-            const userData = database.users[username];
-            
-            if (userData.password !== password) {
-                errorEl.textContent = 'Mot de passe incorrect';
-                errorEl.style.display = 'block';
-                return;
-            }
+/* ------------------------------
+   NOTIFICATIONS
+------------------------------ */
 
-            currentUser = userData;
-            document.getElementById('loginPage').classList.remove('active');
-            document.getElementById('messagingPage').classList.add('active');
-            document.getElementById('currentUsername').textContent = username;
-            loadFriends();
-        });
+function showNotification(message) {
+    const notif = document.getElementById('notification');
+    notif.textContent = message;
+    notif.style.display = 'block';
+    setTimeout(() => notif.style.display = 'none', 3000);
+}
 
-        // LOGOUT
-        function logout() {
-            currentUser = null;
-            currentChat = null;
-            document.getElementById('messagingPage').classList.remove('active');
-            document.getElementById('loginPage').classList.add('active');
-            document.getElementById('loginForm').reset();
-        }
+/* ------------------------------
+   SIGNUP
+------------------------------ */
 
-        // ADD FRIEND
-        function addFriend() {
-            const friendUsername = document.getElementById('friendUsername').value.trim();
-            
-            if (!friendUsername) {
-                showNotification('Entrez un pseudo');
-                return;
-            }
+document.getElementById('signupForm').addEventListener('submit', (e) => {
+    e.preventDefault();
 
-            if (friendUsername === currentUser.username) {
-                showNotification('Vous ne pouvez pas vous ajouter vous-même');
-                return;
-            }
+    const username = signupUsername.value.trim();
+    const password = signupPassword.value;
+    const passwordConfirm = signupPasswordConfirm.value;
 
-            if (!database.users[friendUsername]) {
-                showNotification('Utilisateur non trouvé');
-                return;
-            }
+    signupError.style.display = 'none';
+    signupSuccess.style.display = 'none';
 
-            if (currentUser.friends.includes(friendUsername)) {
-                showNotification('Cet ami est déjà dans votre liste');
-                return;
-            }
+    if (password !== passwordConfirm) {
+        signupError.textContent = 'Les mots de passe ne correspondent pas';
+        signupError.style.display = 'block';
+        return;
+    }
 
-            currentUser.friends.push(friendUsername);
-            
-            document.getElementById('friendUsername').value = '';
-            showNotification(`${friendUsername} ajouté à vos amis !`);
-            loadFriends();
-        }
+    if (database.users[username]) {
+        signupError.textContent = 'Ce pseudo est déjà utilisé';
+        signupError.style.display = 'block';
+        return;
+    }
 
-        // LOAD FRIENDS
-        function loadFriends() {
-            const friendsList = document.getElementById('friendsList');
-            friendsList.innerHTML = '';
+    database.users[username] = {
+        username,
+        password,
+        friends: [],
+        createdAt: new Date().toISOString()
+    };
 
-            if (currentUser.friends.length === 0) {
-                friendsList.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 2rem;">Aucun ami ajouté</p>';
-                return;
-            }
+    saveDatabase();
 
-            for (const friendUsername of currentUser.friends) {
-                const friendDiv = document.createElement('div');
-                friendDiv.className = 'friend-item';
-                friendDiv.innerHTML = `
-                    <div class="friend-name">${friendUsername}</div>
-                    <div class="friend-status">Cliquez pour discuter</div>
-                `;
-                friendDiv.onclick = () => openChat(friendUsername);
-                friendsList.appendChild(friendDiv);
-            }
-        }
+    signupSuccess.textContent = 'Compte créé avec succès !';
+    signupSuccess.style.display = 'block';
 
-        // OPEN CHAT
-        function openChat(friendUsername) {
-            currentChat = friendUsername;
-            
-            document.querySelectorAll('.friend-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.querySelector('.friend-name').textContent === friendUsername) {
-                    item.classList.add('active');
-                }
-            });
+    signupForm.reset();
+    setTimeout(showLogin, 2000);
+});
 
-            document.getElementById('chatHeader').innerHTML = `<h3>${friendUsername}</h3>`;
-            document.getElementById('chatInputContainer').style.display = 'block';
-            
-            loadMessages();
-        }
+/* ------------------------------
+   LOGIN
+------------------------------ */
 
-        // LOAD MESSAGES
-        function loadMessages() {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.innerHTML = '';
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
 
-            const chatKey = getChatKey(currentUser.username, currentChat);
-            
-            if (!database.chats[chatKey] || database.chats[chatKey].length === 0) {
-                messagesContainer.innerHTML = '<div class="empty-chat">Aucun message. Commencez la conversation !</div>';
-                return;
-            }
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value;
 
-            const messages = database.chats[chatKey];
-            
-            messages.forEach(msg => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${msg.sender === currentUser.username ? 'sent' : 'received'}`;
-                messageDiv.innerHTML = `
-                    <div class="message-sender">${msg.sender}</div>
-                    <div class="message-text">${msg.text}</div>
-                    <div class="message-time">${new Date(msg.timestamp).toLocaleString('fr-FR')}</div>
-                `;
-                messagesContainer.appendChild(messageDiv);
-            });
+    loginError.style.display = 'none';
 
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
+    if (!database.users[username]) {
+        loginError.textContent = 'Utilisateur non trouvé';
+        loginError.style.display = 'block';
+        return;
+    }
 
-        // GET CHAT KEY
-        function getChatKey(user1, user2) {
-            return [user1, user2].sort().join('_');
-        }
+    if (database.users[username].password !== password) {
+        loginError.textContent = 'Mot de passe incorrect';
+        loginError.style.display = 'block';
+        return;
+    }
 
-        // SEND MESSAGE
-        document.getElementById('messageForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const messageText = document.getElementById('messageInput').value.trim();
-            if (!messageText || !currentChat) return;
+    // Login success
+    currentUser = database.users[username];
+    saveCurrentUser();
 
-            const chatKey = getChatKey(currentUser.username, currentChat);
-            
-            if (!database.chats[chatKey]) {
-                database.chats[chatKey] = [];
-            }
+    loginPage.classList.remove('active');
+    messagingPage.classList.add('active');
 
-            const newMessage = {
-                sender: currentUser.username,
-                text: messageText,
-                timestamp: new Date().toISOString()
-            };
+    currentUsername.textContent = username;
+    loadFriends();
+});
 
-            database.chats[chatKey].push(newMessage);
+/* ------------------------------
+   LOGOUT
+------------------------------ */
 
-            document.getElementById('messageInput').value = '';
-            loadMessages();
-        });
+function logout() {
+    currentUser = null;
+    currentChat = null;
+    saveCurrentUser();
 
-        // AUTO-REFRESH MESSAGES (simule la réception de nouveaux messages)
-        setInterval(() => {
-            if (currentChat) {
-                loadMessages();
-            }
-        }, 3000);
-    </script>
+    messagingPage.classList.remove('active');
+    loginPage.classList.add('active');
+
+    loginForm.reset();
+}
+
+/* ------------------------------
+   FRIEND SYSTEM
+------------------------------ */
+
+function addFriend() {
+    const friendUsername = friendUsernameInput.value.trim();
+
+    if (!friendUsername) return showNotification("Entrez un pseudo");
+    if (friendUsername === currentUser.username) return showNotification("Impossible de s'ajouter soi-même");
+    if (!database.users[friendUsername]) return showNotification("Utilisateur introuvable");
+    if (currentUser.friends.includes(friendUsername)) return showNotification("Déjà en ami");
+
+    currentUser.friends.push(friendUsername);
+
+    saveDatabase();
+    saveCurrentUser();
+
+    friendUsernameInput.value = "";
+    showNotification(friendUsername + " ajouté !");
+    loadFriends();
+}
+
+function loadFriends() {
+    friendsList.innerHTML = "";
+
+    if (currentUser.friends.length === 0) {
+        friendsList.innerHTML = "<p style='text-align:center; padding:2rem; color:#999;'>Aucun ami</p>";
+        return;
+    }
+
+    currentUser.friends.forEach(friend => {
+        const div = document.createElement("div");
+        div.className = "friend-item";
+        div.innerHTML = `<div class="friend-name">${friend}</div><div class="friend-status">Cliquez pour discuter</div>`;
+        div.onclick = () => openChat(friend);
+        friendsList.appendChild(div);
+    });
+
+    saveDatabase();
+}
+
+/* ------------------------------
+   CHAT SYSTEM
+------------------------------ */
+
+function openChat(friendUsername) {
+    currentChat = friendUsername;
+
+    document.querySelectorAll('.friend-item').forEach(i => {
+        i.classList.toggle('active', i.querySelector('.friend-name').textContent === friendUsername);
+    });
+
+    chatHeader.innerHTML = `<h3>${friendUsername}</h3>`;
+    chatInputContainer.style.display = "block";
+
+    loadMessages();
+}
+
+function getChatKey(u1, u2) {
+    return [u1, u2].sort().join("_");
+}
+
+function loadMessages() {
+    const chatKey = getChatKey(currentUser.username, currentChat);
+    const messages = database.chats[chatKey] || [];
+
+    chatMessages.innerHTML = "";
+
+    if (messages.length === 0) {
+        chatMessages.innerHTML = "<div class='empty-chat'>Aucun message</div>";
+        return;
+    }
+
+    messages.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "message " + (m.sender === currentUser.username ? "sent" : "received");
+        div.innerHTML = `
+            <div class="message-sender">${m.sender}</div>
+            <div class="message-text">${m.text}</div>
+            <div class="message-time">${new Date(m.timestamp).toLocaleString()}</div>
+        `;
+        chatMessages.appendChild(div);
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+document.getElementById("messageForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const text = messageInput.value.trim();
+    if (!text) return;
+
+    const chatKey = getChatKey(currentUser.username, currentChat);
+
+    if (!database.chats[chatKey]) database.chats[chatKey] = [];
+
+    database.chats[chatKey].push({
+        sender: currentUser.username,
+        text,
+        timestamp: new Date().toISOString()
+    });
+
+    messageInput.value = "";
+    saveDatabase();
+    loadMessages();
+});
+
+/* AUTO REFRESH */
+setInterval(() => {
+    if (currentChat) loadMessages();
+}, 2000);
+</script>
+
 </body>
+
 </html>
