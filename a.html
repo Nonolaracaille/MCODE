@@ -5,27 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MCODE - Messaging App</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: system-ui, sans-serif;
             background-color: #000;
             color: #e7e7e7;
             min-height: 100vh;
             line-height: 1.5;
         }
 
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
+        .page { display: none; }
+        .page.active { display: block; }
 
         /* LOGIN PAGE */
         .login-container {
@@ -36,38 +27,6 @@
             background: linear-gradient(135deg, #1a1a1a 0%, #2d1b4e 100%);
             position: relative;
             overflow: hidden;
-        }
-
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.3;
-            animation: orbFloat 10s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        .orb1 {
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(45deg, #a855f7, #ec4899);
-            top: 10%;
-            left: -10%;
-        }
-
-        .orb2 {
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-            bottom: 20%;
-            right: 10%;
-            animation-delay: 2s;
-        }
-
-        @keyframes orbFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-50px, 50px) scale(0.9); }
         }
 
         .login-box, .signup-box {
@@ -90,95 +49,47 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #a855f7;
-            font-weight: 500;
-        }
-
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; color: #a855f7; }
         .input-group input {
-            width: 100%;
-            padding: 0.8rem;
+            width: 100%; padding: 0.8rem;
             background: rgba(168, 85, 247, 0.1);
             border: 1px solid rgba(168, 85, 247, 0.3);
             border-radius: 10px;
             color: white;
             font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #a855f7;
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
         }
 
         .btn-primary {
-            width: 100%;
-            padding: 1rem;
+            width: 100%; padding: 1rem;
             background: linear-gradient(135deg, #a855f7, #ec4899);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border: none; border-radius: 10px;
+            color: white; font-size: 1.1rem; cursor: pointer;
             margin-top: 1rem;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5);
-        }
+        .switch-text { text-align: center; margin-top: 1.5rem; }
+        .switch-link { color: #a855f7; cursor: pointer; }
 
-        .switch-text {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #9ca3af;
-        }
-
-        .switch-link {
-            color: #a855f7;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
+        .error-message, .success-message {
             padding: 0.8rem;
             border-radius: 10px;
             margin-bottom: 1rem;
             display: none;
         }
 
-        .success-message {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid #22c55e;
-            color: #86efac;
-            padding: 0.8rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            display: none;
-        }
+        .error-message { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .success-message { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; }
 
         /* MESSAGING PAGE */
         .messaging-container {
             display: flex;
             height: 100vh;
-            background: #000;
         }
 
         .sidebar {
             width: 300px;
-            background: rgba(26, 26, 26, 0.9);
+            background: #111;
             border-right: 1px solid rgba(168, 85, 247, 0.2);
             display: flex;
             flex-direction: column;
@@ -187,80 +98,17 @@
         .sidebar-header {
             padding: 1.5rem;
             border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-header h2 {
-            background: linear-gradient(90deg, #a855f7, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
         .btn-logout {
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid #ef4444;
-            color: #fca5a5;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            padding: 0.4rem 1rem; border-radius: 8px;
+            color: #fca5a5; cursor: pointer;
         }
 
-        .btn-logout:hover {
-            background: rgba(239, 68, 68, 0.4);
-        }
-
-        .user-info {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-        }
-
-        .user-info p {
-            color: #9ca3af;
-            font-size: 0.9rem;
-        }
-
-        .user-info strong {
-            color: #a855f7;
-        }
-
-        .add-friend-section {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-        }
-
-        .add-friend-input {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .add-friend-input input {
-            flex: 1;
-            padding: 0.5rem;
-            background: rgba(168, 85, 247, 0.1);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            border-radius: 8px;
-            color: white;
-        }
-
-        .btn-add {
-            padding: 0.5rem 1rem;
-            background: linear-gradient(135deg, #a855f7, #ec4899);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-add:hover {
-            transform: scale(1.05);
-        }
+        .user-info { padding: 1rem 1.5rem; border-bottom: 1px solid rgba(168, 85, 247, 0.2); }
 
         .friends-list {
             flex: 1;
@@ -271,8 +119,8 @@
         .friend-item {
             padding: 1rem 1.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
             border-left: 3px solid transparent;
+            transition: 0.2s;
         }
 
         .friend-item:hover {
@@ -285,497 +133,311 @@
             border-left-color: #ec4899;
         }
 
-        .friend-name {
-            font-weight: 600;
-            color: white;
-            margin-bottom: 0.3rem;
-        }
+        .chat-container { flex: 1; display: flex; flex-direction: column; }
+        .chat-header { padding: 1.5rem; border-bottom: 1px solid rgba(168, 85, 247, 0.2); }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 2rem; gap: 1rem; display: flex; flex-direction: column; }
 
-        .friend-status {
-            font-size: 0.85rem;
-            color: #9ca3af;
-        }
-
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 100%);
-        }
-
-        .chat-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-        }
-
-        .chat-header h3 {
-            font-size: 1.5rem;
-            color: #a855f7;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .message {
-            max-width: 70%;
-            padding: 1rem;
-            border-radius: 15px;
-            animation: messageSlide 0.3s ease;
-        }
-
-        @keyframes messageSlide {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.sent {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #a855f7, #ec4899);
-            color: white;
-        }
-
-        .message.received {
-            align-self: flex-start;
-            background: rgba(168, 85, 247, 0.1);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-        }
-
-        .message-sender {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            opacity: 0.8;
-        }
-
-        .message-text {
-            word-wrap: break-word;
-        }
-
-        .message-time {
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
-            opacity: 0.7;
-        }
+        .message { max-width: 70%; padding: 1rem; border-radius: 15px; }
+        .sent { align-self: flex-end; background: #a855f7; }
+        .received { background: #222; }
 
         .chat-input-container {
             padding: 1.5rem;
             border-top: 1px solid rgba(168, 85, 247, 0.2);
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
         }
 
-        .chat-input-form {
-            display: flex;
-            gap: 1rem;
-        }
+        .chat-input-form { display: flex; gap: 1rem; }
 
         .chat-input {
-            flex: 1;
-            padding: 1rem;
+            flex: 1; padding: 1rem;
             background: rgba(168, 85, 247, 0.1);
             border: 1px solid rgba(168, 85, 247, 0.3);
-            border-radius: 25px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: #a855f7;
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+            border-radius: 25px; color: white;
         }
 
         .btn-send {
             padding: 1rem 2rem;
-            background: linear-gradient(135deg, #a855f7, #ec4899);
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: #a855f7;
+            border: none; border-radius: 25px;
+            color: white; cursor: pointer;
         }
 
-        .btn-send:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5);
-        }
-
-        .empty-chat {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #9ca3af;
-            font-size: 1.2rem;
-        }
-
-        .notification {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            padding: 1rem 2rem;
-            background: linear-gradient(135deg, #a855f7, #ec4899);
-            border-radius: 10px;
-            color: white;
-            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5);
-            z-index: 1000;
-            animation: slideInRight 0.3s ease;
-            display: none;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        .empty-chat { text-align: center; margin-top: 4rem; color: #aaa; }
     </style>
 </head>
 <body>
-    <!-- LOGIN PAGE -->
-    <div id="loginPage" class="page active">
-        <div class="login-container">
-            <div class="orb orb1"></div>
-            <div class="orb orb2"></div>
 
-            <div class="login-box" id="loginBox">
-                <h2>CONNEXION</h2>
-                <div class="error-message" id="loginError"></div>
-                <form id="loginForm">
-                    <div class="input-group">
-                        <label>Pseudo</label>
-                        <input type="text" id="loginUsername" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Mot de passe</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Se connecter</button>
-                </form>
-                <p class="switch-text">
-                    Pas de compte ? <span class="switch-link" onclick="showSignup()">Créer un compte</span>
-                </p>
-            </div>
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="page active">
+    <div class="login-container">
+        <div class="login-box" id="loginBox">
+            <h2>CONNEXION</h2>
+            <div class="error-message" id="loginError"></div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>Pseudo</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="input-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">Se connecter</button>
+            </form>
+            <p class="switch-text">
+                Pas de compte ? <span class="switch-link" onclick="showSignup()">Créer un compte</span>
+            </p>
+        </div>
 
-            <div class="signup-box" id="signupBox" style="display: none;">
-                <h2>CRÉER UN COMPTE</h2>
-                <div class="error-message" id="signupError"></div>
-                <div class="success-message" id="signupSuccess"></div>
-                <form id="signupForm">
-                    <div class="input-group">
-                        <label>Pseudo</label>
-                        <input type="text" id="signupUsername" required minlength="3">
-                    </div>
-                    <div class="input-group">
-                        <label>Mot de passe</label>
-                        <input type="password" id="signupPassword" required minlength="4">
-                    </div>
-                    <div class="input-group">
-                        <label>Confirmer le mot de passe</label>
-                        <input type="password" id="signupPasswordConfirm" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Créer le compte</button>
-                </form>
-                <p class="switch-text">
-                    Déjà un compte ? <span class="switch-link" onclick="showLogin()">Se connecter</span>
-                </p>
-            </div>
+        <div class="signup-box" id="signupBox" style="display:none;">
+            <h2>CRÉER UN COMPTE</h2>
+            <div class="error-message" id="signupError"></div>
+            <div class="success-message" id="signupSuccess"></div>
+
+            <form id="signupForm">
+                <div class="input-group">
+                    <label>Pseudo</label>
+                    <input type="text" id="signupUsername" required minlength="3">
+                </div>
+                <div class="input-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="signupPassword" required minlength="4">
+                </div>
+                <div class="input-group">
+                    <label>Confirmer</label>
+                    <input type="password" id="signupPasswordConfirm" required>
+                </div>
+                <button type="submit" class="btn-primary">Créer le compte</button>
+            </form>
+
+            <p class="switch-text">
+                Déjà un compte ? <span class="switch-link" onclick="showLogin()">Se connecter</span>
+            </p>
         </div>
     </div>
+</div>
 
-    <!-- MESSAGING PAGE -->
-    <div id="messagingPage" class="page">
-        <div class="messaging-container">
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    <h2>MCODE</h2>
-                    <button class="btn-logout" onclick="logout()">Déconnexion</button>
-                </div>
-                <div class="user-info">
-                    <p>Connecté en tant que <strong id="currentUsername"></strong></p>
-                </div>
-                <div class="add-friend-section">
-                    <h3 style="color: #a855f7; margin-bottom: 0.5rem;">Ajouter un ami</h3>
-                    <div class="add-friend-input">
-                        <input type="text" id="friendUsername" placeholder="Pseudo de l'ami">
-                        <button class="btn-add" onclick="addFriend()">+</button>
-                    </div>
-                </div>
-                <div class="friends-list" id="friendsList"></div>
+<!-- MESSAGING PAGE -->
+<div id="messagingPage" class="page">
+    <div class="messaging-container">
+
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>MCODE</h2>
+                <button class="btn-logout" onclick="logout()">Déconnexion</button>
             </div>
 
-            <div class="chat-container">
-                <div class="chat-header" id="chatHeader">
-                    <h3>Sélectionnez une conversation</h3>
-                </div>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="empty-chat">Sélectionnez un ami pour commencer à discuter</div>
-                </div>
-                <div class="chat-input-container" style="display: none;" id="chatInputContainer">
-                    <form class="chat-input-form" id="messageForm">
-                        <input type="text" class="chat-input" id="messageInput" placeholder="Écrivez votre message..." required>
-                        <button type="submit" class="btn-send">Envoyer</button>
-                    </form>
-                </div>
+            <div class="user-info">
+                Connecté en tant que <strong id="currentUsername"></strong>
+            </div>
+
+            <div class="friends-list" id="friendsList"></div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header" id="chatHeader">
+                <h3>Sélectionnez un utilisateur</h3>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="empty-chat">Choisissez un utilisateur pour commencer.</div>
+            </div>
+
+            <div class="chat-input-container" id="chatInputContainer" style="display:none;">
+                <form id="messageForm" class="chat-input-form">
+                    <input type="text" id="messageInput" class="chat-input" placeholder="Message..." required>
+                    <button type="submit" class="btn-send">Envoyer</button>
+                </form>
             </div>
         </div>
-    </div>
 
-    <div class="notification" id="notification"></div>
+    </div>
+</div>
 
 <script>
-/* ------------------------------
-   LOCALSTORAGE DATABASE SYSTEM
------------------------------- */
-
-// Load database from localStorage or create new
+/* -------------------------
+      DATABASE SYSTEM
+------------------------- */
 function loadDatabase() {
     const db = localStorage.getItem("mcode_database");
     return db ? JSON.parse(db) : { users: {}, chats: {} };
 }
 
-// Save database to localStorage
 function saveDatabase() {
     localStorage.setItem("mcode_database", JSON.stringify(database));
 }
 
-// Load current user if remembered
 function loadCurrentUser() {
-    const user = localStorage.getItem("mcode_currentUser");
-    return user ? JSON.parse(user) : null;
+    const data = localStorage.getItem("mcode_currentUser");
+    return data ? JSON.parse(data) : null;
 }
 
-// Save current user
 function saveCurrentUser() {
-    if (currentUser)
-        localStorage.setItem("mcode_currentUser", JSON.stringify(currentUser));
-    else
-        localStorage.removeItem("mcode_currentUser");
+    if (currentUser) localStorage.setItem("mcode_currentUser", JSON.stringify(currentUser));
+    else localStorage.removeItem("mcode_currentUser");
 }
-
-/* ------------------------------
-   INITIALIZATION
------------------------------- */
 
 let database = loadDatabase();
 let currentUser = loadCurrentUser();
 let currentChat = null;
 
-// If user already logged in ⇒ go to messaging page
+/* -------------------------
+      AUTO LOGIN
+------------------------- */
 window.onload = () => {
     if (currentUser) {
-        document.getElementById('loginPage').classList.remove('active');
-        document.getElementById('messagingPage').classList.add('active');
-        document.getElementById('currentUsername').textContent = currentUser.username;
-        loadFriends();
+        loginPage.classList.remove("active");
+        messagingPage.classList.add("active");
+        currentUsername.textContent = currentUser.username;
+        loadAllUsers();
     }
 };
 
-/* ------------------------------
-   LOGIN / SIGNUP SWITCH
------------------------------- */
-
+/* -------------------------
+      LOGIN / SIGNUP
+------------------------- */
 function showSignup() {
-    document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('signupBox').style.display = 'block';
+    loginBox.style.display = "none";
+    signupBox.style.display = "block";
 }
 
 function showLogin() {
-    document.getElementById('signupBox').style.display = 'none';
-    document.getElementById('loginBox').style.display = 'block';
+    signupBox.style.display = "none";
+    loginBox.style.display = "block";
 }
 
-/* ------------------------------
-   NOTIFICATIONS
------------------------------- */
-
-function showNotification(message) {
-    const notif = document.getElementById('notification');
-    notif.textContent = message;
-    notif.style.display = 'block';
-    setTimeout(() => notif.style.display = 'none', 3000);
-}
-
-/* ------------------------------
-   SIGNUP
------------------------------- */
-
-document.getElementById('signupForm').addEventListener('submit', (e) => {
+document.getElementById("signupForm").addEventListener("submit", e => {
     e.preventDefault();
 
-    const username = signupUsername.value.trim();
-    const password = signupPassword.value;
-    const passwordConfirm = signupPasswordConfirm.value;
+    const u = signupUsername.value.trim();
+    const p = signupPassword.value;
+    const p2 = signupPasswordConfirm.value;
 
-    signupError.style.display = 'none';
-    signupSuccess.style.display = 'none';
+    signupError.style.display = "none";
+    signupSuccess.style.display = "none";
 
-    if (password !== passwordConfirm) {
-        signupError.textContent = 'Les mots de passe ne correspondent pas';
-        signupError.style.display = 'block';
+    if (p !== p2) {
+        signupError.textContent = "Les mots de passe ne correspondent pas";
+        signupError.style.display = "block";
         return;
     }
 
-    if (database.users[username]) {
-        signupError.textContent = 'Ce pseudo est déjà utilisé';
-        signupError.style.display = 'block';
+    if (database.users[u]) {
+        signupError.textContent = "Pseudo déjà utilisé";
+        signupError.style.display = "block";
         return;
     }
 
-    database.users[username] = {
-        username,
-        password,
-        friends: [],
-        createdAt: new Date().toISOString()
-    };
-
+    database.users[u] = { username: u, password: p };
     saveDatabase();
 
-    signupSuccess.textContent = 'Compte créé avec succès !';
-    signupSuccess.style.display = 'block';
+    signupSuccess.textContent = "Compte créé avec succès !";
+    signupSuccess.style.display = "block";
 
     signupForm.reset();
-    setTimeout(showLogin, 2000);
+    setTimeout(showLogin, 1500);
 });
 
-/* ------------------------------
-   LOGIN
------------------------------- */
-
-document.getElementById('loginForm').addEventListener('submit', (e) => {
+document.getElementById("loginForm").addEventListener("submit", e => {
     e.preventDefault();
 
-    const username = loginUsername.value.trim();
-    const password = loginPassword.value;
+    const u = loginUsername.value.trim();
+    const p = loginPassword.value;
 
-    loginError.style.display = 'none';
+    loginError.style.display = "none";
 
-    if (!database.users[username]) {
-        loginError.textContent = 'Utilisateur non trouvé';
-        loginError.style.display = 'block';
+    if (!database.users[u]) {
+        loginError.textContent = "Utilisateur introuvable";
+        loginError.style.display = "block";
         return;
     }
 
-    if (database.users[username].password !== password) {
-        loginError.textContent = 'Mot de passe incorrect';
-        loginError.style.display = 'block';
+    if (database.users[u].password !== p) {
+        loginError.textContent = "Mot de passe incorrect";
+        loginError.style.display = "block";
         return;
     }
 
-    // Login success
-    currentUser = database.users[username];
+    currentUser = database.users[u];
     saveCurrentUser();
 
-    loginPage.classList.remove('active');
-    messagingPage.classList.add('active');
+    loginPage.classList.remove("active");
+    messagingPage.classList.add("active");
 
-    currentUsername.textContent = username;
-    loadFriends();
+    currentUsername.textContent = u;
+    loadAllUsers();
 });
 
-/* ------------------------------
-   LOGOUT
------------------------------- */
-
+/* -------------------------
+        LOGOUT
+------------------------- */
 function logout() {
     currentUser = null;
     currentChat = null;
     saveCurrentUser();
 
-    messagingPage.classList.remove('active');
-    loginPage.classList.add('active');
+    messagingPage.classList.remove("active");
+    loginPage.classList.add("active");
 
     loginForm.reset();
 }
 
-/* ------------------------------
-   FRIEND SYSTEM
------------------------------- */
-
-function addFriend() {
-    const friendUsername = friendUsernameInput.value.trim();
-
-    if (!friendUsername) return showNotification("Entrez un pseudo");
-    if (friendUsername === currentUser.username) return showNotification("Impossible de s'ajouter soi-même");
-    if (!database.users[friendUsername]) return showNotification("Utilisateur introuvable");
-    if (currentUser.friends.includes(friendUsername)) return showNotification("Déjà en ami");
-
-    currentUser.friends.push(friendUsername);
-
-    saveDatabase();
-    saveCurrentUser();
-
-    friendUsernameInput.value = "";
-    showNotification(friendUsername + " ajouté !");
-    loadFriends();
-}
-
-function loadFriends() {
+/* -------------------------
+   DISPLAY ALL USERS
+------------------------- */
+function loadAllUsers() {
     friendsList.innerHTML = "";
 
-    if (currentUser.friends.length === 0) {
-        friendsList.innerHTML = "<p style='text-align:center; padding:2rem; color:#999;'>Aucun ami</p>";
+    const users = Object.keys(database.users).filter(u => u !== currentUser.username);
+
+    if (users.length === 0) {
+        friendsList.innerHTML = "<p style='text-align:center;color:#aaa;padding:2rem;'>Aucun utilisateur trouvé</p>";
         return;
     }
 
-    currentUser.friends.forEach(friend => {
+    users.forEach(username => {
         const div = document.createElement("div");
         div.className = "friend-item";
-        div.innerHTML = `<div class="friend-name">${friend}</div><div class="friend-status">Cliquez pour discuter</div>`;
-        div.onclick = () => openChat(friend);
+        div.innerHTML = `<div class="friend-name">${username}</div>`;
+        div.onclick = () => openChat(username);
         friendsList.appendChild(div);
     });
-
-    saveDatabase();
 }
 
-/* ------------------------------
-   CHAT SYSTEM
------------------------------- */
+/* -------------------------
+       CHAT SYSTEM
+------------------------- */
+function getChatKey(a, b) {
+    return [a, b].sort().join("_");
+}
 
-function openChat(friendUsername) {
-    currentChat = friendUsername;
+function openChat(username) {
+    currentChat = username;
 
-    document.querySelectorAll('.friend-item').forEach(i => {
-        i.classList.toggle('active', i.querySelector('.friend-name').textContent === friendUsername);
+    document.querySelectorAll(".friend-item").forEach(i => {
+        i.classList.toggle("active", i.textContent.trim() === username);
     });
 
-    chatHeader.innerHTML = `<h3>${friendUsername}</h3>`;
+    chatHeader.innerHTML = `<h3>${username}</h3>`;
     chatInputContainer.style.display = "block";
-
     loadMessages();
 }
 
-function getChatKey(u1, u2) {
-    return [u1, u2].sort().join("_");
-}
-
 function loadMessages() {
-    const chatKey = getChatKey(currentUser.username, currentChat);
-    const messages = database.chats[chatKey] || [];
+    const key = getChatKey(currentUser.username, currentChat);
+    const msgs = database.chats[key] || [];
 
     chatMessages.innerHTML = "";
 
-    if (messages.length === 0) {
-        chatMessages.innerHTML = "<div class='empty-chat'>Aucun message</div>";
+    if (msgs.length === 0) {
+        chatMessages.innerHTML = `<div class="empty-chat">Aucun message</div>`;
         return;
     }
 
-    messages.forEach(m => {
+    msgs.forEach(m => {
         const div = document.createElement("div");
         div.className = "message " + (m.sender === currentUser.username ? "sent" : "received");
-        div.innerHTML = `
-            <div class="message-sender">${m.sender}</div>
-            <div class="message-text">${m.text}</div>
-            <div class="message-time">${new Date(m.timestamp).toLocaleString()}</div>
-        `;
+        div.textContent = m.text;
         chatMessages.appendChild(div);
     });
 
@@ -785,21 +447,20 @@ function loadMessages() {
 document.getElementById("messageForm").addEventListener("submit", e => {
     e.preventDefault();
 
-    const text = messageInput.value.trim();
-    if (!text) return;
+    const txt = messageInput.value.trim();
+    if (!txt) return;
 
-    const chatKey = getChatKey(currentUser.username, currentChat);
+    const key = getChatKey(currentUser.username, currentChat);
+    if (!database.chats[key]) database.chats[key] = [];
 
-    if (!database.chats[chatKey]) database.chats[chatKey] = [];
-
-    database.chats[chatKey].push({
+    database.chats[key].push({
         sender: currentUser.username,
-        text,
-        timestamp: new Date().toISOString()
+        text: txt,
+        timestamp: Date.now()
     });
 
-    messageInput.value = "";
     saveDatabase();
+    messageInput.value = "";
     loadMessages();
 });
 
@@ -810,5 +471,4 @@ setInterval(() => {
 </script>
 
 </body>
-
 </html>
